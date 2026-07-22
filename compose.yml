@@ -10,21 +10,34 @@ services:
     environment:
       - REDISCLI_AUTH=${REDIS_PASSWORD}
     volumes:
-      - redis_data:/data
+      - ./data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
-    expose:
-      - "6379"
+    ports:
+      # Bind apenas em loopback: acesso remoto só via túnel SSH (ver README).
+      - "127.0.0.1:6379:6379"
     networks:
       - infra
+    logging:
+      # Log vai para stderr (docker logs redis); rotação por tamanho,
+      # sem depender de logrotate/permissões no host.
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "10"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
-
-volumes:
-  redis_data:
+    deploy:
+      resources:
+        limits:
+          # Ajuste conforme a RAM do servidor.
+          # Regra: REDIS_MAXMEMORY + margem para fork do BGSAVE/AOF rewrite
+          # (copy-on-write pode duplicar parte das páginas em uso durante o rewrite)
+          memory: 1G
+          cpus: "1"
 
 networks:
   infra:

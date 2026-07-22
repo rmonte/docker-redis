@@ -1,0 +1,10 @@
+services:
+  redis:
+    # Publica em todas as interfaces (em vez de só 127.0.0.1, como em compose.yml).
+    # Necessário em Windows/WSL2: o "localhost forwarding" do WSL2 é pouco confiável
+    # quando o processo escuta estritamente em 127.0.0.1, o que impede o acesso a
+    # partir do Windows (ex: RedisInsight, TablePlus). Sem risco de exposição externa:
+    # a rede NAT padrão do WSL2 só é alcançável a partir da própria máquina Windows.
+    # Não usar em produção — ver README > Ambiente de desenvolvimento (Windows/WSL2).
+    ports:
+      - "6379:6379"
