@@ -13,8 +13,15 @@ services:
       - ./data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
     ports:
+      # Sintaxe longa (com "target") é a recomendada pelo Compose Spec quando
+      # há override em compose.dev.yml: assim o merge substitui a entrada pelo
+      # "target" em vez de concatenar as duas — evita "port already in use"
+      # ao publicar a mesma porta do container duas vezes.
       # Bind apenas em loopback: acesso remoto só via túnel SSH (ver README).
-      - "127.0.0.1:6379:6379"
+      - target: 6379
+        published: "6379"
+        host_ip: 127.0.0.1
+        protocol: tcp
     networks:
       - infra
     logging:

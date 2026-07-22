@@ -6,5 +6,10 @@ services:
     # partir do Windows (ex: RedisInsight, TablePlus). Sem risco de exposição externa:
     # a rede NAT padrão do WSL2 só é alcançável a partir da própria máquina Windows.
     # Não usar em produção — ver README > Ambiente de desenvolvimento (Windows/WSL2).
-    ports:
-      - "6379:6379"
+    # "!override" (Compose Spec) substitui a lista de compose.yml em vez de
+    # concatenar — sem essa tag, a porta 6379 seria publicada duas vezes
+    # (uma por arquivo) e o segundo bind falharia com "port already in use".
+    ports: !override
+      - target: 6379
+        published: "6379"
+        protocol: tcp
